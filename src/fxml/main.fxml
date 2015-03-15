@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="450.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8"
+            fx:controller="controllers.MainController">
+    <children>
+        <AnchorPane layoutX="454.0" prefHeight="414.0" prefWidth="332.0" AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <WebView fx:id="webviewSitePreview" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="20.0"
+                         AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="120.0"/>
+                <Button fx:id="btnGetSitePreview" layoutX="20.0" layoutY="14.0" mnemonicParsing="false"
+                        onAction="#getSitePreview" text="Get Site Preview" AnchorPane.rightAnchor="20.0"
+                        AnchorPane.topAnchor="70.0"/>
+                <Separator orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="20.0"
+                           AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="20.0"/>
+                <ImageView fitHeight="53.0" fitWidth="292.0" pickOnBounds="true" preserveRatio="true"
+                           AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+                    <image>
+                        <Image url="@worldmostawesomejob-logo.png"/>
+                    </image>
+                </ImageView>
+            </children>
+        </AnchorPane>
+        <AnchorPane AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="330.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Label fx:id="lblInfoLongUrl" layoutX="35.0" layoutY="14.0" text="Put your long URL here:"
+                       AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0"/>
+                <TextField fx:id="txtLongUrl" layoutX="35.0" layoutY="63.0" AnchorPane.leftAnchor="20.0"
+                           AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="50.0"/>
+                <Button fx:id="btnShortenUrl" layoutX="248.0" layoutY="63.0" mnemonicParsing="false"
+                        onAction="#shortenURL" text="Shorten URL" AnchorPane.rightAnchor="20.0"
+                        AnchorPane.topAnchor="50.0"/>
+            </children>
+        </AnchorPane>
+        <AnchorPane AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="330.0" AnchorPane.topAnchor="80.0">
+            <children>
+                <Separator prefWidth="200.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
+                           AnchorPane.topAnchor="20.0"/>
+                <Label fx:id="lblInfoShortURL" layoutX="44.0" layoutY="14.0" text="Here is your short URL!"
+                       AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="50.0"/>
+                <Button fx:id="btnCopyUrl" layoutX="247.0" layoutY="20.0" mnemonicParsing="false"
+                        onAction="#copyUrlToBuffer" prefHeight="31.0" prefWidth="103.0" text="Copy URL"
+                        AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0"/>
+                <TextField fx:id="txtShortUrl" layoutX="22.0" layoutY="58.0" AnchorPane.leftAnchor="20.0"
+                           AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="80.0"/>
+                <Button fx:id="btnGoToUrl" layoutX="247.0" layoutY="58.0" mnemonicParsing="false" onAction="#goToSite"
+                        prefHeight="31.0" prefWidth="103.0" text="Go To" AnchorPane.rightAnchor="20.0"
+                        AnchorPane.topAnchor="80.0"/>
+            </children>
+        </AnchorPane>
+        <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="330.0"
+                    AnchorPane.topAnchor="190.0">
+            <children>
+                <Separator prefWidth="200.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
+                           AnchorPane.topAnchor="20.0"/>
+                <TableView fx:id="tableUrlsHistory" editable="true" AnchorPane.bottomAnchor="65.0"
+                           AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0">
+                    <columns>
+                        <TableColumn fx:id="columnLongUrl" prefWidth="75.0" text="Long URL"/>
+                        <TableColumn fx:id="columnShortUrl" prefWidth="75.0" text="Short URL"/>
+                        <TableColumn fx:id="columnCreated" prefWidth="75.0" text="Created"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+                <Label fx:id="lblUrlsCount" text="Total URLs shortened: 0 " AnchorPane.bottomAnchor="20.0"
+                       AnchorPane.leftAnchor="20.0"/>
+                <Button fx:id="btnClearHistory" layoutX="345.0" layoutY="198.0" mnemonicParsing="false"
+                        onAction="#clearTable" prefHeight="31.0" prefWidth="103.0" text="Clear List"
+                        AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0"/>
+                <Button fx:id="btnDeleteRow" layoutX="206.0" layoutY="209.0" mnemonicParsing="false"
+                        onAction="#deleteRow" prefHeight="31.0" prefWidth="103.0" text="Delete"/>
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>
