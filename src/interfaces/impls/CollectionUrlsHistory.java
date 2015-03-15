@@ -33,7 +33,7 @@ public class CollectionUrlsHistory implements UrlsHistory {
     public void print() {
         System.out.println();
         for (UrlItem urlItem : urlItemList) {
-            System.out.println(urlItem.getId() + ", long URL: " + urlItem.getLongUrl() + ", short URL: " + urlItem.getShortUrl());
+            System.out.println(urlItem.toString());
         }
     }
 

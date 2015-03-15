@@ -17,9 +17,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("../fxml/main.fxml"));
         primaryStage.setTitle("URL Shortener");
-        primaryStage.setMinHeight(400);
-        primaryStage.setMinWidth(700);
-        primaryStage.setScene(new Scene(root, 780, 450));
+        primaryStage.setMinHeight(450);
+        primaryStage.setMinWidth(840);
+        primaryStage.setScene(new Scene(root, 840, 450));
         primaryStage.show();
 
         testData();

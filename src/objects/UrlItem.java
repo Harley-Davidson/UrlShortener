@@ -1,6 +1,7 @@
 package objects;
 
-import java.text.DateFormat;
+import javafx.beans.property.SimpleStringProperty;
+
 import java.text.SimpleDateFormat;
 
 /**
@@ -8,33 +9,33 @@ import java.text.SimpleDateFormat;
  */
 public class UrlItem {
     private static int idCounter;
-    private String longUrl;
-    private String shortUrl;
+    private SimpleStringProperty longUrl = new SimpleStringProperty("");
+    private SimpleStringProperty shortUrl = new SimpleStringProperty("");
     private int id;
     private long registrationTime;
 
     public UrlItem(String longUrl, String shortUrl) {
-        this.longUrl = longUrl;
-        this.shortUrl = shortUrl;
+        this.longUrl.set(longUrl);
+        this.shortUrl.set(shortUrl);
         registrationTime = System.currentTimeMillis();
         this.id = (int) registrationTime + idCounter;
         idCounter++;
     }
 
     public String getLongUrl() {
-        return longUrl;
+        return longUrl.get();
     }
 
     public void setLongUrl(String longUrl) {
-        this.longUrl = longUrl;
+        this.longUrl.set(longUrl);
     }
 
     public String getShortUrl() {
-        return shortUrl;
+        return shortUrl.get();
     }
 
     public void setShortUrl(String shortUrl) {
-        this.shortUrl = shortUrl;
+        this.shortUrl.set(shortUrl);
     }
 
     public int getId() {
@@ -46,12 +47,27 @@ public class UrlItem {
     }
 
     public String getRegistrationTime() {
-        DateFormat formatter = new SimpleDateFormat("HH:mm:ss, dd-MMM-yy");
-        String timeFormatted = formatter.format(registrationTime);
-        return timeFormatted;
+        return (new SimpleDateFormat("HH:mm:ss, dd-MMM-yy")).format(registrationTime);
     }
 
     public void setRegistrationTime(long registrationTime) {
         this.registrationTime = registrationTime;
+    }
+
+    @Override
+    public String toString() {
+        return "UrlItem{" +
+                "longUrl='" + longUrl.get() + '\'' +
+                ", shortUrl='" + shortUrl.get() + '\'' +
+                ", registrationTime=" + getRegistrationTime() +
+                '}';
+    }
+
+    public SimpleStringProperty longUrlProperty() {
+        return longUrl;
+    }
+
+    public SimpleStringProperty shortUrlProperty() {
+        return shortUrl;
     }
 }

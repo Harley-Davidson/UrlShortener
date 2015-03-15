@@ -6,9 +6,11 @@ package controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
-public class ClearTable {
+public class ClearTableDialog {
     public boolean answerClicked;
 
     @FXML
@@ -18,13 +20,14 @@ public class ClearTable {
     public Button btnClearHistoryCancel;
 
     public void clearTableConfirmed(ActionEvent actionEvent) {
-        System.out.println("Clearance confirmed");
-        answerClicked = true;
+        clearTableClose(actionEvent);
+
     }
 
-    public void clearTableNotConfirmed(ActionEvent actionEvent) {
-        System.out.println("Clearance rejected");
-        answerClicked = true;
+    public void clearTableClose(ActionEvent actionEvent) {
+        Node source = (Node) actionEvent.getSource();
+        Stage stage = (Stage) source.getScene().getWindow();
+        stage.close();
     }
 
     public boolean isAnswerClicked() {
