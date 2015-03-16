@@ -8,7 +8,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.*;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebView;
@@ -20,8 +23,12 @@ import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import utils.DialogManager;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
 
 
 public class MainController {
@@ -62,10 +69,6 @@ public class MainController {
     private Stage clearTableDialogStage;
     private ClearTableDialogController clearTableDialogController;
 
-//    public void setUrlsHistoryImpl(CollectionUrlsHistory urlsHistoryImpl) {
-//        this.urlsHistoryImpl = urlsHistoryImpl;
-//    }
-
     @FXML
     private void initialize() {
         columnLongUrl.setCellValueFactory(new PropertyValueFactory<UrlItem, String>("longUrl"));
@@ -105,8 +108,9 @@ public class MainController {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getClickCount() == 1) {
-                    String longUrl = ((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem()).getLongUrl();
-                    if (longUrl != null) webviewSitePreview.getEngine().load(longUrl);
+                    webviewSitePreview.getEngine().load("");
+                    UrlItem urlItem = ((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem());
+                    if (urlItem != null) webviewSitePreview.getEngine().load(urlItem.getLongUrl());
                 }
             }
         });
@@ -116,52 +120,45 @@ public class MainController {
         lblUrlsCount.setText("Total URLs shortened: " + urlsHistoryImpl.getUrlItemList().size());
     }
 
-    public void actionButtonPressed(ActionEvent actionEvent) {
-        Object source = actionEvent.getSource();
-        if (!(source instanceof Button)) {
-            return;
-        }
-        Button clickedButton = (Button) source;
-        UrlItem selectedUrl = (UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem();
-
-        switch (clickedButton.getId()) {
-            case "btnDeleteRow":
-                urlsHistoryImpl.delete((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem());
-                break;
-            case "btnCopyUrl":
-                System.out.println("copy " + selectedUrl);
-                break;
-            case "btnClearHistory":
-                urlsHistoryImpl.clearHistory();
-                break;
-        }
-    }
-
     public void shortenURL(ActionEvent actionEvent) {
-        System.out.println("Shortened URL");
+//        System.out.println("Shortened URL");
+        urlsHistoryImpl.add(new UrlItem(txtLongUrl.getText(), txtShortUrl.getText()));
     }
 
     public void copyUrlToBuffer(ActionEvent actionEvent) {
-        System.out.println("URL copied");
+//        System.out.println("URL copied");
+        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection stringSelection = new StringSelection(txtShortUrl.getText());
+        clpbrd.setContents(stringSelection, null);
     }
 
     public void goToSite(ActionEvent actionEvent) {
-        System.out.println("Fancy Site");
+//        System.out.println("Fancy Site");
+        try {
+            Desktop.getDesktop().browse(new URL("http://".concat(txtLongUrl.getText())).toURI());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void clearTable(ActionEvent actionEvent) {
-        if (clearTableDialogStage == null) {
-            clearTableDialogStage = new Stage();
-            clearTableDialogStage.setTitle("Clear URL History");
-            clearTableDialogStage.setMinWidth(450);
-            clearTableDialogStage.setMinHeight(110);
-            clearTableDialogStage.setResizable(false);
-            clearTableDialogStage.setScene(new Scene(fxmlClearTable));
-            clearTableDialogStage.initModality(Modality.WINDOW_MODAL);
-            clearTableDialogStage.initOwner(mainStage);
-            clearTableDialogStage.showAndWait();
-        } else clearTableDialogStage.showAndWait();
-        if (ClearTableDialogController.isConfirmed) urlsHistoryImpl.clearHistory();
+        if (!urlsHistoryImpl.getUrlItemList().isEmpty()) {
+            if (clearTableDialogStage == null) {
+                clearTableDialogStage = new Stage();
+                clearTableDialogStage.setTitle("Clear URL History");
+                clearTableDialogStage.setMinWidth(450);
+                clearTableDialogStage.setMinHeight(110);
+                clearTableDialogStage.setResizable(false);
+                clearTableDialogStage.setScene(new Scene(fxmlClearTable));
+                clearTableDialogStage.initModality(Modality.WINDOW_MODAL);
+                clearTableDialogStage.initOwner(mainStage);
+                clearTableDialogStage.showAndWait();
+            } else clearTableDialogStage.showAndWait();
+            if (ClearTableDialogController.isConfirmed) {
+                urlsHistoryImpl.clearHistory();
+                webviewSitePreview.getEngine().load("");
+            }
+        } else DialogManager.showErrorDialog("Error", "URL shortening history is empty!");
     }
 
     private void initLoader() {
@@ -172,7 +169,7 @@ public class MainController {
             clearTableDialogController = fxmlLoader.getController();
 
         } catch (IOException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
