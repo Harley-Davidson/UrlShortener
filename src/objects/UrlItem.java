@@ -1,5 +1,6 @@
 package objects;
 
+import interfaces.UrlShortening;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.text.SimpleDateFormat;
@@ -7,7 +8,7 @@ import java.text.SimpleDateFormat;
 /**
  * Created by Max on 14.03.2015.
  */
-public class UrlItem {
+public class UrlItem implements UrlShortening {
     private static int idCounter;
     private SimpleStringProperty longUrl = new SimpleStringProperty("");
     private SimpleStringProperty shortUrl = new SimpleStringProperty("");
@@ -69,5 +70,25 @@ public class UrlItem {
 
     public SimpleStringProperty shortUrlProperty() {
         return shortUrl;
+    }
+
+    @Override
+    public void encodeLongUrl(UrlItem urlItem) {
+
+    }
+
+    @Override
+    public void decodeShortUrl(UrlItem urlItem) {
+
+    }
+
+    @Override
+    public void goToUrl(UrlItem urlItem) {
+
+    }
+
+    @Override
+    public void copyUrl(UrlItem urlItem) {
+
     }
 }

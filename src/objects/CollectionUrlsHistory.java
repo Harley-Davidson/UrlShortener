@@ -1,9 +1,8 @@
-package interfaces.impls;
+package objects;
 
 import interfaces.UrlsHistory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import objects.UrlItem;
 
 /**
  * Created by Max on 14.03.2015.

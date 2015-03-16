@@ -1,6 +1,5 @@
 package controllers;
 
-import interfaces.impls.CollectionUrlsHistory;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -15,9 +14,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import objects.CollectionUrlsHistory;
 import objects.UrlItem;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
+import utils.DialogManager;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -104,7 +105,8 @@ public class MainController {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getClickCount() == 1) {
-                    webviewSitePreview.getEngine().load(((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem()).getLongUrl());
+                    String longUrl = ((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem()).getLongUrl();
+                    if (longUrl != null) webviewSitePreview.getEngine().load(longUrl);
                 }
             }
         });
@@ -159,7 +161,7 @@ public class MainController {
             clearTableDialogStage.initOwner(mainStage);
             clearTableDialogStage.showAndWait();
         } else clearTableDialogStage.showAndWait();
-        if (clearTableDialogController.btnClearHistoryConfirm.isPressed()) urlsHistoryImpl.clearHistory();
+        if (ClearTableDialogController.isConfirmed) urlsHistoryImpl.clearHistory();
     }
 
     private void initLoader() {
@@ -175,8 +177,12 @@ public class MainController {
     }
 
     public void deleteRow(ActionEvent actionEvent) {
-        urlsHistoryImpl.delete((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem());
+        UrlItem urlItem = (UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem();
+        urlsHistoryImpl.delete(urlItem);
         webviewSitePreview.getEngine().load("");
+        if (urlItem == null) {
+            DialogManager.showErrorDialog("Error", "URL shortening history is empty!");
+        }
         System.out.println("Row is deleted");
     }
 
