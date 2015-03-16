@@ -23,7 +23,7 @@ public class CollectionUrlsHistory implements UrlsHistory {
 
     @Override
     public void clearHistory() {
-
+        urlItemList.clear();
     }
 
     public ObservableList<UrlItem> getUrlItemList() {

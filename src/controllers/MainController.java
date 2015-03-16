@@ -1,12 +1,12 @@
 package controllers;
 
 import interfaces.impls.CollectionUrlsHistory;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,27 +16,24 @@ import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import objects.UrlItem;
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 
 public class MainController {
     @FXML
     public WebView webviewSitePreview;
     @FXML
-    public Button btnGetSitePreview;
-    @FXML
     public Label lblInfoLongUrl;
-    @FXML
-    public TextField txtLongUrl;
     @FXML
     public Button btnShortenUrl;
     @FXML
     public Label lblInfoShortURL;
     @FXML
     public Button btnCopyUrl;
-    @FXML
-    public TextField txtShortUrl;
     @FXML
     public Button btnGoToUrl;
     @FXML
@@ -53,30 +50,46 @@ public class MainController {
     public TableColumn<UrlItem, Long> columnCreated;
     @FXML
     public TableView tableUrlsHistory;
+    @FXML
+    private CustomTextField txtLongUrl;
+    @FXML
+    private CustomTextField txtShortUrl;
     private CollectionUrlsHistory urlsHistoryImpl = new CollectionUrlsHistory();
     private Stage mainStage;
-    private Parent fxmlEdit;
+    private Parent fxmlClearTable;
     private FXMLLoader fxmlLoader = new FXMLLoader();
-    private ClearTableDialog clearTableDialogStage;
+    private Stage clearTableDialogStage;
+    private ClearTableDialogController clearTableDialogController;
 
-    public void setUrlsHistoryImpl(CollectionUrlsHistory urlsHistoryImpl) {
-        this.urlsHistoryImpl = urlsHistoryImpl;
-    }
+//    public void setUrlsHistoryImpl(CollectionUrlsHistory urlsHistoryImpl) {
+//        this.urlsHistoryImpl = urlsHistoryImpl;
+//    }
 
     @FXML
     private void initialize() {
         columnLongUrl.setCellValueFactory(new PropertyValueFactory<UrlItem, String>("longUrl"));
         columnShortUrl.setCellValueFactory(new PropertyValueFactory<UrlItem, String>("shortUrl"));
         columnCreated.setCellValueFactory(new PropertyValueFactory<UrlItem, Long>("registrationTime"));
-
+        setupClearButtonField(txtLongUrl);
+        setupClearButtonField(txtShortUrl);
         initListeners();
-
+        initLoader();
         fillData();
     }
 
     private void fillData() {
         urlsHistoryImpl.fillTestData();
         tableUrlsHistory.setItems(urlsHistoryImpl.getUrlItemList());
+    }
+
+    private void setupClearButtonField(CustomTextField customTextField) {
+        try {
+            Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class, ObjectProperty.class);
+            m.setAccessible(true);
+            m.invoke(null, customTextField, customTextField.rightProperty());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void initListeners() {
@@ -101,7 +114,7 @@ public class MainController {
         lblUrlsCount.setText("Total URLs shortened: " + urlsHistoryImpl.getUrlItemList().size());
     }
 
-    public void showDialog(ActionEvent actionEvent) {
+    public void actionButtonPressed(ActionEvent actionEvent) {
         Object source = actionEvent.getSource();
         if (!(source instanceof Button)) {
             return;
@@ -111,23 +124,19 @@ public class MainController {
 
         switch (clickedButton.getId()) {
             case "btnDeleteRow":
-                System.out.println("delete " + selectedUrl);
+                urlsHistoryImpl.delete((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem());
                 break;
             case "btnCopyUrl":
                 System.out.println("copy " + selectedUrl);
                 break;
-            case "btnGetSitePreview":
-                System.out.println("preview " + selectedUrl);
+            case "btnClearHistory":
+                urlsHistoryImpl.clearHistory();
                 break;
         }
     }
 
     public void shortenURL(ActionEvent actionEvent) {
         System.out.println("Shortened URL");
-    }
-
-    public void getSitePreview(ActionEvent actionEvent) {
-        System.out.println("Fancy Site");
     }
 
     public void copyUrlToBuffer(ActionEvent actionEvent) {
@@ -139,35 +148,39 @@ public class MainController {
     }
 
     public void clearTable(ActionEvent actionEvent) {
-        try {
-            Stage stage = new Stage();
-            Parent root = FXMLLoader.load(getClass().getResource("../fxml/clearTable.fxml"));
-            stage.setTitle("Clear URL History");
-            stage.setMinWidth(450);
-            stage.setMinHeight(110);
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node) actionEvent.getSource()).getScene().getWindow());
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if (clearTableDialogStage == null) {
+            clearTableDialogStage = new Stage();
+            clearTableDialogStage.setTitle("Clear URL History");
+            clearTableDialogStage.setMinWidth(450);
+            clearTableDialogStage.setMinHeight(110);
+            clearTableDialogStage.setResizable(false);
+            clearTableDialogStage.setScene(new Scene(fxmlClearTable));
+            clearTableDialogStage.initModality(Modality.WINDOW_MODAL);
+            clearTableDialogStage.initOwner(mainStage);
+            clearTableDialogStage.showAndWait();
+        } else clearTableDialogStage.showAndWait();
+        if (clearTableDialogController.btnClearHistoryConfirm.isPressed()) urlsHistoryImpl.clearHistory();
     }
 
     private void initLoader() {
         try {
 
-            fxmlLoader.setLocation(getClass().getResource("../fxml/edit.fxml"));
-            fxmlEdit = fxmlLoader.load();
-            clearTableDialogStage = fxmlLoader.getController();
+            fxmlLoader.setLocation(getClass().getResource("../fxml/clearTable.fxml"));
+            fxmlClearTable = fxmlLoader.load();
+            clearTableDialogController = fxmlLoader.getController();
 
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
     public void deleteRow(ActionEvent actionEvent) {
+        urlsHistoryImpl.delete((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem());
+        webviewSitePreview.getEngine().load("");
         System.out.println("Row is deleted");
+    }
+
+    public void setMainStage(Stage mainStage) {
+        this.mainStage = mainStage;
     }
 }

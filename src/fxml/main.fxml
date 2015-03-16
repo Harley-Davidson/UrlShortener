@@ -5,6 +5,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.WebView?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="450.0" prefWidth="840.0" xmlns="http://javafx.com/javafx/8"
             fx:controller="controllers.MainController">
@@ -19,11 +20,12 @@
                                 <Label fx:id="lblInfoLongUrl" layoutX="35.0" layoutY="14.0"
                                        text="Put your long URL here:" AnchorPane.leftAnchor="20.0"
                                        AnchorPane.topAnchor="20.0"/>
-                                <TextField fx:id="txtLongUrl" layoutX="35.0" layoutY="63.0" AnchorPane.leftAnchor="20.0"
-                                           AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="50.0"/>
                                 <Button fx:id="btnShortenUrl" layoutX="248.0" layoutY="63.0" mnemonicParsing="false"
                                         onAction="#shortenURL" text="Shorten URL" AnchorPane.rightAnchor="20.0"
                                         AnchorPane.topAnchor="50.0"/>
+                                <CustomTextField fx:id="txtLongUrl" layoutX="27.0" layoutY="35.0" promptText="Long URL"
+                                                 AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="150.0"
+                                                 AnchorPane.topAnchor="50.0"/>
                             </children>
                         </AnchorPane>
                         <AnchorPane AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
@@ -37,12 +39,12 @@
                                 <Button fx:id="btnCopyUrl" layoutX="247.0" layoutY="20.0" mnemonicParsing="false"
                                         onAction="#copyUrlToBuffer" prefHeight="31.0" prefWidth="103.0" text="Copy URL"
                                         AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0"/>
-                                <TextField fx:id="txtShortUrl" layoutX="22.0" layoutY="58.0"
-                                           AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="150.0"
-                                           AnchorPane.topAnchor="80.0"/>
                                 <Button fx:id="btnGoToUrl" layoutX="247.0" layoutY="58.0" mnemonicParsing="false"
                                         onAction="#goToSite" prefHeight="31.0" prefWidth="103.0" text="Go To"
                                         AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="80.0"/>
+                                <CustomTextField fx:id="txtShortUrl" layoutX="20.0" layoutY="82.0"
+                                                 promptText="Short URL" AnchorPane.leftAnchor="20.0"
+                                                 AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="80.0"/>
                             </children>
                         </AnchorPane>
                         <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"

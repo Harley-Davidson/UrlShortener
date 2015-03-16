@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
       minWidth="-Infinity" prefHeight="110.0" prefWidth="405.0" xmlns="http://javafx.com/javafx/8"
-      fx:controller="controllers.ClearTableDialog">
+      fx:controller="controllers.ClearTableDialogController">
     <children>
         <Label text="Are you sure you want to clear URL shortener history?">
             <VBox.margin>
