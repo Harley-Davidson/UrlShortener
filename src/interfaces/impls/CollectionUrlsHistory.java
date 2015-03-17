@@ -1,8 +1,9 @@
-package objects;
+package interfaces.impls;
 
 import interfaces.UrlsHistory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import objects.UrlItem;
 
 /**
  * Created by Max on 14.03.2015.
@@ -12,7 +13,7 @@ public class CollectionUrlsHistory implements UrlsHistory {
 
     @Override
     public void add(UrlItem urlItem) {
-        urlItemList.add(urlItem);
+        urlItemList.add(0, urlItem);
     }
 
     @Override

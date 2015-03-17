@@ -1,12 +1,12 @@
 package start;
 
 import controllers.MainController;
+import interfaces.impls.CollectionUrlsHistory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import objects.CollectionUrlsHistory;
 
 public class Main extends Application {
 
@@ -34,7 +34,7 @@ public class Main extends Application {
     private void testData() {
         CollectionUrlsHistory urlsHistory = new CollectionUrlsHistory();
         urlsHistory.fillTestData();
-        urlsHistory.print();
+//        urlsHistory.print();
     }
 
 }

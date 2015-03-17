@@ -1,5 +1,7 @@
 package controllers;
 
+import interfaces.impls.CollectionUrlsHistory;
+import interfaces.impls.UrlEncryption;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -17,7 +19,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import objects.CollectionUrlsHistory;
 import objects.UrlItem;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -32,6 +33,7 @@ import java.net.URL;
 
 
 public class MainController {
+    public static final String SITE_ADRESS = "site.com/";
     @FXML
     public WebView webviewSitePreview;
     @FXML
@@ -57,7 +59,7 @@ public class MainController {
     @FXML
     public TableColumn<UrlItem, Long> columnCreated;
     @FXML
-    public TableView tableUrlsHistory;
+    public TableView<UrlItem> tableUrlsHistory;
     @FXML
     private CustomTextField txtLongUrl;
     @FXML
@@ -68,6 +70,8 @@ public class MainController {
     private FXMLLoader fxmlLoader = new FXMLLoader();
     private Stage clearTableDialogStage;
     private ClearTableDialogController clearTableDialogController;
+    private UrlItem selectedUrlItem = new UrlItem("", "");
+
 
     @FXML
     private void initialize() {
@@ -81,17 +85,13 @@ public class MainController {
         fillData();
     }
 
-    private void fillData() {
-        urlsHistoryImpl.fillTestData();
-        tableUrlsHistory.setItems(urlsHistoryImpl.getUrlItemList());
-    }
-
-    private void setupClearButtonField(CustomTextField customTextField) {
+    private void initLoader() {
         try {
-            Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class, ObjectProperty.class);
-            m.setAccessible(true);
-            m.invoke(null, customTextField, customTextField.rightProperty());
-        } catch (Exception e) {
+
+            fxmlLoader.setLocation(getClass().getResource("../fxml/clearTable.fxml"));
+            fxmlClearTable = fxmlLoader.load();
+            clearTableDialogController = fxmlLoader.getController();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -109,36 +109,16 @@ public class MainController {
             public void handle(MouseEvent event) {
                 if (event.getClickCount() == 1) {
                     webviewSitePreview.getEngine().load("");
-                    UrlItem urlItem = ((UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem());
-                    if (urlItem != null) webviewSitePreview.getEngine().load(urlItem.getLongUrl());
+                    selectedUrlItem = (tableUrlsHistory.getSelectionModel().getSelectedItem());
+                    if (selectedUrlItem != null) webviewSitePreview.getEngine().load(selectedUrlItem.getLongUrl());
                 }
             }
         });
     }
 
-    public void updateLblUrlsCount() {
-        lblUrlsCount.setText("Total URLs shortened: " + urlsHistoryImpl.getUrlItemList().size());
-    }
-
-    public void shortenURL(ActionEvent actionEvent) {
-//        System.out.println("Shortened URL");
-        urlsHistoryImpl.add(new UrlItem(txtLongUrl.getText(), txtShortUrl.getText()));
-    }
-
-    public void copyUrlToBuffer(ActionEvent actionEvent) {
-//        System.out.println("URL copied");
-        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection stringSelection = new StringSelection(txtShortUrl.getText());
-        clpbrd.setContents(stringSelection, null);
-    }
-
-    public void goToSite(ActionEvent actionEvent) {
-//        System.out.println("Fancy Site");
-        try {
-            Desktop.getDesktop().browse(new URL("http://".concat(txtLongUrl.getText())).toURI());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void fillData() {
+        urlsHistoryImpl.fillTestData();
+        tableUrlsHistory.setItems(urlsHistoryImpl.getUrlItemList());
     }
 
     public void clearTable(ActionEvent actionEvent) {
@@ -161,26 +141,78 @@ public class MainController {
         } else DialogManager.showErrorDialog("Error", "URL shortening history is empty!");
     }
 
-    private void initLoader() {
+    private void setupClearButtonField(CustomTextField customTextField) {
         try {
-
-            fxmlLoader.setLocation(getClass().getResource("../fxml/clearTable.fxml"));
-            fxmlClearTable = fxmlLoader.load();
-            clearTableDialogController = fxmlLoader.getController();
-
-        } catch (IOException e) {
+            Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class, ObjectProperty.class);
+            m.setAccessible(true);
+            m.invoke(null, customTextField, customTextField.rightProperty());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void updateLblUrlsCount() {
+        lblUrlsCount.setText("Total URLs shortened: " + urlsHistoryImpl.getUrlItemList().size());
+    }
+
+    public void shortenURL(ActionEvent actionEvent) {
+        boolean shortUrlIsNew = true;
+        if (txtLongUrl.getText().equals(""))
+            DialogManager.showInfoDialog("Empty URL field", "Please fill the Long URL field");
+        else if (!txtLongUrl.getText().contains(".")) {
+            DialogManager.showInfoDialog("URL field", "Seems like your URL is not correct");
+        } else {
+            while (shortUrlIsNew) {
+                UrlItem urlItem = new UrlItem(txtLongUrl.getText(), "");
+                new UrlEncryption().encrypt(urlItem);
+
+                for (UrlItem urlItem1 : urlsHistoryImpl.getUrlItemList()) {
+                    if (!urlItem1.getShortUrl().equals(urlItem.getShortUrl())) {
+                        urlsHistoryImpl.add(urlItem);
+                        System.out.println(urlItem.getId());
+                        shortUrlIsNew = false;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public void copyUrlToBuffer(ActionEvent actionEvent) {
+        String textToCopy;
+        if (txtShortUrl.getText().equals("")) textToCopy = selectedUrlItem.getShortUrl();
+        else textToCopy = txtShortUrl.getText();
+        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection stringSelection = new StringSelection(textToCopy);
+        clpbrd.setContents(stringSelection, null);
+    }
+
+    public void goToSite(ActionEvent actionEvent) {
+        int id = new UrlEncryption().decrypt(txtShortUrl.getText());
+        System.out.println(id);
+        for (UrlItem urlItem1 : urlsHistoryImpl.getUrlItemList()) {
+            if (urlItem1.getId() == id) {
+                txtLongUrl.setText(urlItem1.getLongUrl());
+                break;
+            }
+        }
+
+
+        try {
+            Desktop.getDesktop().browse(new URL("http://".concat(txtLongUrl.getText())).toURI());
+        } catch (Exception e) {
+            DialogManager.showInfoDialog("Empty URL field", "Please fill the Short URL field");
+        }
+    }
+
     public void deleteRow(ActionEvent actionEvent) {
-        UrlItem urlItem = (UrlItem) tableUrlsHistory.getSelectionModel().getSelectedItem();
-        urlsHistoryImpl.delete(urlItem);
-        webviewSitePreview.getEngine().load("");
+        UrlItem urlItem = tableUrlsHistory.getSelectionModel().getSelectedItem();
         if (urlItem == null) {
             DialogManager.showErrorDialog("Error", "URL shortening history is empty!");
+        } else {
+            urlsHistoryImpl.delete(urlItem);
+            webviewSitePreview.getEngine().load("");
         }
-        System.out.println("Row is deleted");
     }
 
     public void setMainStage(Stage mainStage) {
