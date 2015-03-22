@@ -1,0 +1,3 @@
+http://forbes.com/, http://localhost:8000/gIw7, 1562087, 1427054135074
+facebook.com, http://localhost:8000/ipui, 1965532, 1427053883802
+mindvalley.com, http://localhost:8000/jakV, 2145619, 1427053875147

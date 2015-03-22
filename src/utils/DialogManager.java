@@ -19,7 +19,7 @@ public class DialogManager {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setContentText(text);
-        alert.setHeaderText("");
+        alert.setHeaderText("We are totally sorry!");
         alert.showAndWait();
     }
 }

@@ -33,7 +33,8 @@ import java.net.URL;
 
 
 public class MainController {
-    public static final String SITE_ADRESS = "site.com/";
+    public static final String SITE_ADRESS = "http://localhost:8000/";
+    private static CollectionUrlsHistory urlsHistoryImpl = new CollectionUrlsHistory();
     @FXML
     public WebView webviewSitePreview;
     @FXML
@@ -64,7 +65,6 @@ public class MainController {
     private CustomTextField txtLongUrl;
     @FXML
     private CustomTextField txtShortUrl;
-    private CollectionUrlsHistory urlsHistoryImpl = new CollectionUrlsHistory();
     private Stage mainStage;
     private Parent fxmlClearTable;
     private FXMLLoader fxmlLoader = new FXMLLoader();
@@ -72,6 +72,9 @@ public class MainController {
     private ClearTableDialogController clearTableDialogController;
     private UrlItem selectedUrlItem = new UrlItem("", "");
 
+    public static int encryptFromShortUrlToId(String shortUrlGiven) {
+        return new UrlEncryption().decrypt(shortUrlGiven);
+    }
 
     @FXML
     private void initialize() {
@@ -83,6 +86,7 @@ public class MainController {
         initListeners();
         initLoader();
         fillData();
+        testData();
     }
 
     private void initLoader() {
@@ -107,17 +111,23 @@ public class MainController {
         tableUrlsHistory.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (event.getClickCount() == 1) {
-                    webviewSitePreview.getEngine().load("");
-                    selectedUrlItem = (tableUrlsHistory.getSelectionModel().getSelectedItem());
-                    if (selectedUrlItem != null) webviewSitePreview.getEngine().load(selectedUrlItem.getLongUrl());
+                try {
+                    if (event.getClickCount() == 1) {
+                        webviewSitePreview.getEngine().load("");
+                        selectedUrlItem = (tableUrlsHistory.getSelectionModel().getSelectedItem());
+                        String selectedUrlItemLongUrl = selectedUrlItem.getLongUrl();
+                        if (selectedUrlItemLongUrl != null)
+                            webviewSitePreview.getEngine().load("https://".concat(selectedUrlItemLongUrl));
+                    }
+                } catch (Exception e) {
+                    System.out.println("Problems with URL selection for webview. Try to select once again");
                 }
             }
         });
     }
 
     private void fillData() {
-        urlsHistoryImpl.fillTestData();
+        urlsHistoryImpl.fillArchiveData();
         tableUrlsHistory.setItems(urlsHistoryImpl.getUrlItemList());
     }
 
@@ -152,7 +162,7 @@ public class MainController {
     }
 
     public void updateLblUrlsCount() {
-        lblUrlsCount.setText("Total URLs shortened: " + urlsHistoryImpl.getUrlItemList().size());
+        lblUrlsCount.setText("Total URLs shortened: " + (urlsHistoryImpl.getUrlItemList().size()));
     }
 
     public void shortenURL(ActionEvent actionEvent) {
@@ -165,14 +175,18 @@ public class MainController {
             while (shortUrlIsNew) {
                 UrlItem urlItem = new UrlItem(txtLongUrl.getText(), "");
                 new UrlEncryption().encrypt(urlItem);
-
-                for (UrlItem urlItem1 : urlsHistoryImpl.getUrlItemList()) {
-                    if (!urlItem1.getShortUrl().equals(urlItem.getShortUrl())) {
-                        urlsHistoryImpl.add(urlItem);
-                        System.out.println(urlItem.getId());
-                        shortUrlIsNew = false;
-                        break;
+                if (!urlsHistoryImpl.getUrlItemList().isEmpty()) {
+                    for (UrlItem urlItem1 : urlsHistoryImpl.getUrlItemList()) {
+                        if (!urlItem1.getShortUrl().equals(urlItem.getShortUrl())) {
+                            urlsHistoryImpl.add(urlItem);
+                            System.out.println(urlItem.getId());
+                            shortUrlIsNew = false;
+                            break;
+                        }
                     }
+                } else {
+                    urlsHistoryImpl.add(urlItem);
+                    shortUrlIsNew = false;
                 }
             }
         }
@@ -196,8 +210,6 @@ public class MainController {
                 break;
             }
         }
-
-
         try {
             Desktop.getDesktop().browse(new URL("http://".concat(txtLongUrl.getText())).toURI());
         } catch (Exception e) {
@@ -208,7 +220,7 @@ public class MainController {
     public void deleteRow(ActionEvent actionEvent) {
         UrlItem urlItem = tableUrlsHistory.getSelectionModel().getSelectedItem();
         if (urlItem == null) {
-            DialogManager.showErrorDialog("Error", "URL shortening history is empty!");
+            DialogManager.showErrorDialog("Error", "URL is not selected or shortening history is empty");
         } else {
             urlsHistoryImpl.delete(urlItem);
             webviewSitePreview.getEngine().load("");
@@ -218,4 +230,10 @@ public class MainController {
     public void setMainStage(Stage mainStage) {
         this.mainStage = mainStage;
     }
+
+    private void testData() {
+        CollectionUrlsHistory urlsHistory = new CollectionUrlsHistory();
+        urlsHistory.fillArchiveData();
+    }
+
 }
