@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 
 /**
  * Created by Max on 14.03.2015.
+ *
+ * This class instances are created after original long URL
+ * shortening to short URL
  */
 public class UrlItem {
     private static int idCounter;

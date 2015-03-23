@@ -1,3 +1,2 @@
-http://forbes.com/, http://localhost:8000/gIw7, 1562087, 1427054135074
-facebook.com, http://localhost:8000/ipui, 1965532, 1427053883802
-mindvalley.com, http://localhost:8000/jakV, 2145619, 1427053875147
+en.wikipedia.org/wiki/Conway%27s_Game_of_Life, http://localhost:8000/kd71, 2398523, 1427128878617
+download.oracle.com/otndocs/products/javafx/2/samples/Ensemble/index.html#SAMPLES/Concurrency/Task, http://localhost:8000/fyRS, 1286606, 1427128760963

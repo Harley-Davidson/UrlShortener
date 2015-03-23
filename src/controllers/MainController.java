@@ -173,7 +173,7 @@ public class MainController {
             DialogManager.showInfoDialog("URL field", "Seems like your URL is not correct");
         } else {
             while (shortUrlIsNew) {
-                UrlItem urlItem = new UrlItem(txtLongUrl.getText(), "");
+                UrlItem urlItem = new UrlItem(txtLongUrl.getText().replace("http://", "").replace("https://", ""), "");
                 new UrlEncryption().encrypt(urlItem);
                 if (!urlsHistoryImpl.getUrlItemList().isEmpty()) {
                     for (UrlItem urlItem1 : urlsHistoryImpl.getUrlItemList()) {
@@ -202,8 +202,8 @@ public class MainController {
     }
 
     public void goToSite(ActionEvent actionEvent) {
+        txtLongUrl.clear();
         int id = new UrlEncryption().decrypt(txtShortUrl.getText());
-        System.out.println(id);
         for (UrlItem urlItem1 : urlsHistoryImpl.getUrlItemList()) {
             if (urlItem1.getId() == id) {
                 txtLongUrl.setText(urlItem1.getLongUrl());
