@@ -27,11 +27,16 @@ public class Main extends Application {
         launch(args);
     }
 
-    private static void runServer() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-        server.createContext("/", new RequestHandler());
-        server.setExecutor(null); // creates a default executor
-        server.start();
+    private static void runServer() {
+        HttpServer server = null;
+        try {
+            server = HttpServer.create(new InetSocketAddress(8000), 0);
+            server.createContext("/", new RequestHandler());
+            server.setExecutor(null); // creates a default executor
+            server.start();
+        } catch (IOException e) {
+            System.out.println("Server is already running");
+        }
     }
 
     @Override
